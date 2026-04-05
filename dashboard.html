@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zero Downtime AI — Control Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#06080f;--surf:#0d1117;--surf2:#161b24;--bord:#21293a;
+      --text:#e6edf3;--mute:#7d8a99;
+      --acc:#00d4aa;--acc2:#00b4ff;
+      --red:#ff4757;--redbg:rgba(255,71,87,.08);
+      --warn:#ffa502;--ok:#2ed573;--okbg:rgba(46,213,115,.06);
+      --pur:#a78bfa;
+    }
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+    /* ─ HEADER ─ */
+    header{
+      background:linear-gradient(90deg,#00120e,#000d18 50%,#0a0014);
+      border-bottom:1px solid var(--bord);
+      padding:0 28px;height:58px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:200;
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-name{font-size:16px;font-weight:700;letter-spacing:-.3px}
+    .brand-name span{color:var(--acc)}
+    .hdr-right{display:flex;align-items:center;gap:14px}
+    .live-pill{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--mute)}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:dp 2s ease-in-out infinite}
+    @keyframes dp{0%,100%{opacity:1}50%{opacity:.35}}
+    .clk{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mute);border:1px solid var(--bord);padding:3px 9px;border-radius:5px;background:var(--surf)}
+
+    /* ─ HERO ─ */
+    .hero{
+      background:linear-gradient(135deg,rgba(0,212,170,.07),rgba(0,180,255,.04),rgba(167,139,250,.03));
+      border-bottom:1px solid rgba(0,212,170,.18);
+      padding:12px 28px;display:flex;align-items:center;gap:12px;
+    }
+    .hbadge{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#000;font-size:9px;font-weight:700;letter-spacing:1.5px;padding:3px 9px;border-radius:4px;white-space:nowrap}
+    .htext{font-size:13px;font-weight:500}.htext b{color:var(--acc)}
+
+    /* ─ TABS NAV ─ */
+    .tabs-nav{
+      display:flex;padding:0 28px;border-bottom:1px solid var(--bord);
+      background:var(--surf);position:sticky;top:58px;z-index:199;
+    }
+    .tab-btn{
+      background:none;border:none;color:var(--mute);font-size:13px;font-weight:500;
+      font-family:'Inter',sans-serif;padding:13px 18px;cursor:pointer;
+      border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px;
+    }
+    .tab-btn:hover{color:var(--text)}
+    .tab-btn.active{color:var(--acc);border-bottom-color:var(--acc)}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    /* ─ LAYOUT ─ */
+    .page{max-width:1360px;margin:0 auto;padding:26px 28px}
+    .two-col{display:grid;grid-template-columns:1fr 350px;gap:20px}
+    .card{background:var(--surf);border:1px solid var(--bord);border-radius:11px;padding:20px;transition:border-color .3s}
+    .card:hover{border-color:rgba(0,212,170,.18)}
+    .slabel{font-size:10px;font-weight:600;letter-spacing:2px;color:var(--mute);text-transform:uppercase;margin-bottom:14px}
+
+    /* ─ KPI GRID ─ */
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .kpi{background:var(--surf);border:1px solid var(--bord);border-radius:10px;padding:15px;position:relative;overflow:hidden}
+    .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--acc),transparent);opacity:.28}
+    .kl{font-size:11px;color:var(--mute);margin-bottom:5px}
+    .kv{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1}
+    .ks{font-size:10px;color:var(--mute);margin-top:4px}
+    .ca{color:var(--acc)}.cw{color:var(--warn)}.cs{color:var(--ok)}.cp{color:var(--pur)}
+
+    /* ─ TRIGGER BUTTON ─ */
+    #trigBtn{
+      background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;
+      padding:12px 24px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;
+      display:flex;align-items:center;gap:9px;font-family:'Inter',sans-serif;
+      box-shadow:0 4px 18px rgba(255,71,87,.28);transition:all .2s;letter-spacing:-.1px;
+    }
+    #trigBtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,71,87,.42)}
+    #trigBtn:active{transform:translateY(0)}
+    #trigBtn:disabled{background:var(--surf2);color:var(--mute);box-shadow:none;transform:none;cursor:not-allowed}
+    .prog-wrap{height:4px;background:var(--bord);border-radius:2px;overflow:hidden;margin-top:13px}
+    .prog-bar{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px;transition:width .6s ease}
+    .prog-info{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);margin-top:5px}
+
+    /* ─ FEED ─ */
+    .feed{display:flex;flex-direction:column;min-height:300px}
+    .feed-item{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid var(--bord);animation:fsi .4s ease forwards;opacity:0}
+    .feed-item:last-child{border-bottom:none}
+    @keyframes fsi{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+    .ficon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:2px solid transparent;background:var(--surf2)}
+    .ficon.rd{background:var(--redbg);border-color:var(--red)}
+    .ficon.gr{background:rgba(0,212,170,.1);border-color:var(--acc)}
+    .ficon.bl{background:rgba(0,180,255,.1);border-color:var(--acc2)}
+    .ficon.or{background:rgba(255,165,2,.1);border-color:var(--warn)}
+    .ficon.pu{background:rgba(167,139,250,.1);border-color:var(--pur)}
+    .ficon.ok{background:rgba(46,213,115,.1);border-color:var(--ok)}
+    .fbody{flex:1}
+    .fhead{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+    .ftag{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:4px;text-transform:uppercase}
+    .tr{background:var(--redbg);color:var(--red);border:1px solid rgba(255,71,87,.3)}
+    .tc{background:rgba(0,212,170,.08);color:var(--acc);border:1px solid rgba(0,212,170,.3)}
+    .tk{background:rgba(0,180,255,.08);color:var(--acc2);border:1px solid rgba(0,180,255,.3)}
+    .ts{background:rgba(255,165,2,.08);color:var(--warn);border:1px solid rgba(255,165,2,.3)}
+    .tt{background:rgba(167,139,250,.08);color:var(--pur);border:1px solid rgba(167,139,250,.3)}
+    .ta{background:rgba(0,212,170,.05);color:#5fbcab;border:1px solid rgba(0,212,170,.2)}
+    .td{background:rgba(46,213,115,.08);color:var(--ok);border:1px solid rgba(46,213,115,.3)}
+    .fts{font-size:11px;color:var(--mute);font-family:'JetBrains Mono',monospace;margin-left:auto}
+    .ftext{font-size:13px;line-height:1.6}
+    .alertbox{background:var(--redbg);border:1px solid rgba(255,71,87,.35);border-radius:7px;padding:11px 14px;margin-top:8px;font-size:13px;color:#ff8b94;font-weight:500}
+    .inv{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mute);background:var(--surf2);border:1px solid var(--bord);border-left:3px solid var(--acc2);border-radius:5px;padding:8px 12px;margin-bottom:7px}
+    .inv span{color:var(--acc2)}
+    .outbox{background:var(--surf2);border:1px solid var(--bord);border-radius:6px;padding:11px 14px;font-size:13px;line-height:1.6}
+
+    /* ─ SUCCESS BANNER ─ */
+    .succ-banner{background:linear-gradient(135deg,rgba(46,213,115,.1),rgba(0,212,170,.07));border:1px solid rgba(46,213,115,.3);border-radius:9px;padding:16px;margin-top:8px}
+    .succ-title{font-size:15px;font-weight:700;color:var(--ok);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .succ-body{font-size:12px;color:#9ed4b4;line-height:1.65;margin-bottom:14px}
+    .cal-btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;text-decoration:none;padding:9px 16px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;transition:all .2s;box-shadow:0 3px 10px rgba(26,115,232,.3)}
+    .cal-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(26,115,232,.48)}
+
+    /* ─ EMPTY STATE ─ */
+    .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--mute);gap:10px;text-align:center}
+    .empty-icon{font-size:34px;opacity:.3}
+
+    /* ─ RIGHT SIDEBAR ─ */
+    .agents{display:flex;flex-direction:column;gap:9px}
+    .arow{background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:11px;transition:all .3s}
+    .arow.running{border-color:var(--acc);background:rgba(0,212,170,.06);box-shadow:0 0 12px rgba(0,212,170,.1)}
+    .arow.done{border-color:rgba(46,213,115,.4);background:rgba(46,213,115,.04)}
+    .aav{width:33px;height:33px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .ainf{flex:1}
+    .aname{font-size:12px;font-weight:600}
+    .adesc{font-size:10px;color:var(--mute);margin-top:2px}
+    .abadge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px}
+    .bi{background:var(--surf);color:var(--mute);border:1px solid var(--bord)}
+    .br{background:rgba(0,212,170,.12);color:var(--acc);border:1px solid rgba(0,212,170,.4);animation:bp 1.2s ease infinite}
+    .bd{background:rgba(46,213,115,.12);color:var(--ok);border:1px solid rgba(46,213,115,.4)}
+    @keyframes bp{0%,100%{opacity:1}50%{opacity:.45}}
+
+    /* ─ LOG ─ */
+    .logbox{height:196px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;scrollbar-width:thin;scrollbar-color:var(--bord) transparent}
+    .lentry{font-family:'JetBrains Mono',monospace;font-size:10.5px;display:flex;gap:9px;padding:2px 0;animation:fsi .3s ease forwards;opacity:0}
+    .lts{color:var(--mute);flex-shrink:0}
+    .llv{font-weight:600;flex-shrink:0;width:36px}
+    .llv.info{color:var(--acc2)}.llv.warn{color:var(--warn)}.llv.error{color:var(--red)}.llv.ok{color:var(--ok)}
+    .lmsg{color:#c5d0de}
+
+    /* ─ SUMMARY ─ */
+    .sumfields{display:flex;flex-direction:column;gap:9px}
+    .sf{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--bord)}
+    .sf:last-child{border-bottom:none;padding-bottom:0}
+    .sfl{font-size:11px;color:var(--mute);flex-shrink:0;width:100px}
+    .sfv{font-size:12px;font-weight:600;text-align:right}
+    .sfv.red{color:var(--red)}.sfv.ca{color:var(--acc)}.sfv.ok{color:var(--ok)}.sfv.pu{color:var(--pur)}
+
+    /* ─ ALLOYDB TAB ─ */
+    .db-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+    .dbm{background:var(--surf2);border:1px solid var(--bord);border-radius:9px;padding:14px}
+    .dbml{font-size:10px;color:var(--mute);margin-bottom:5px}
+    .dbmv{font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace}
+    .dbms{font-size:10px;color:var(--mute);margin-top:3px}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .ptitle{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .pbadge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.8px}
+    .pb1{background:rgba(0,180,255,.1);color:var(--acc2);border:1px solid rgba(0,180,255,.3)}
+    .pb2{background:rgba(167,139,250,.1);color:var(--pur);border:1px solid rgba(167,139,250,.3)}
+    pre.code{background:var(--surf2);border:1px solid var(--bord);border-radius:9px;padding:18px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.8;color:#c9d1d9;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+    .jk{color:var(--acc2)}.js{color:#a5d6ff}.jn{color:#79c0ff}.jv{color:var(--pur)}
+    .vtag{display:inline-flex;align-items:center;gap:7px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:var(--pur);font-size:11px;font-weight:500;padding:6px 12px;border-radius:6px;margin-top:12px}
+    .schm{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}
+    .schm th{text-align:left;padding:7px 11px;font-size:9.5px;font-weight:600;color:var(--mute);letter-spacing:1px;border-bottom:1px solid var(--bord);text-transform:uppercase}
+    .schm td{padding:8px 11px;border-bottom:1px solid var(--bord);font-family:'JetBrains Mono',monospace;font-size:11px}
+    .schm tr:last-child td{border-bottom:none}
+    .schm tr:hover td{background:rgba(255,255,255,.02)}
+    .ttype{color:var(--warn)}.tpk{color:var(--ok)}
+
+    @media(max-width:920px){
+      .two-col,.split,.kpi-row,.db-meta{grid-template-columns:1fr}
+      .page{padding:16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="brand-name">FixFlow <span>AI</span></div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-pill"><div class="dot"></div>All Systems Nominal</div>
+    <div class="clk" id="clk">--:--:--</div>
+  </div>
+</header>
+
+<!-- HERO BANNER -->
+<div class="hero">
+  <div class="hbadge">LIVE</div>
+  <div class="htext"><b>Autonomously Handling Equipment Failures</b> · Multi-Agent Orchestration on Google Cloud</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-nav">
+  <button class="tab-btn active" id="tb-ops" onclick="switchTab('ops')">📊 Operations Dashboard</button>
+  <button class="tab-btn" id="tb-db" onclick="switchTab('db')">🗄️ AlloyDB Inspector</button>
+</div>
+
+<!-- ══════════ TAB 1: OPERATIONS ══════════ -->
+<div class="tab-panel active" id="tp-ops">
+  <div class="page">
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi"><div class="kl">Incidents Today</div><div class="kv cw" id="k-inc">0</div><div class="ks">Active monitoring</div></div>
+      <div class="kpi"><div class="kl">Auto-Resolved</div><div class="kv ca" id="k-res">0</div><div class="ks">100% automation</div></div>
+      <div class="kpi"><div class="kl">Avg. MTTR</div><div class="kv ca" id="k-mttr">—</div><div class="ks">Mean time to resolve</div></div>
+      <div class="kpi"><div class="kl">Agents Online</div><div class="kv ca">5</div><div class="ks">Knowledge·Sched·Task·Analytics</div></div>
+    </div>
+
+    <div class="two-col">
+      <!-- LEFT -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- TRIGGER -->
+        <div class="card">
+          <div class="slabel">Incident Commander · Cloud Pub/Sub</div>
+          <button id="trigBtn" onclick="runWorkflow()">🔴 Trigger IoT Telemetry Alert</button>
+          <div class="prog-wrap"><div class="prog-bar" id="prog"></div></div>
+          <div class="prog-info"><span id="progLbl">Awaiting IoT trigger…</span><span id="progPct">0%</span></div>
+        </div>
+
+        <!-- FEED -->
+        <div class="card">
+          <div class="slabel">Agent Orchestration Feed</div>
+          <div class="feed" id="feed">
+            <div class="empty" id="emptyFeed">
+              <div class="empty-icon">📡</div>
+              <div style="font-size:13px">No active incidents. Click 'Trigger IoT Telemetry Alert' above.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- AGENTS -->
+        <div class="card">
+          <div class="slabel">Sub-Agent Status</div>
+          <div class="agents">
+            <div class="arow" id="ar-coord"><div class="aav" style="background:rgba(0,212,170,.12)">🧠</div><div class="ainf"><div class="aname">Primary Coordinator</div><div class="adesc">Gemini 1.5 Pro · Orchestrator</div></div><div class="abadge bi" id="ab-coord">IDLE</div></div>
+            <div class="arow" id="ar-know"><div class="aav" style="background:rgba(0,180,255,.12)">🤖</div><div class="ainf"><div class="aname">Knowledge Agent</div><div class="adesc">AlloyDB pgvector · text-embedding-004</div></div><div class="abadge bi" id="ab-know">IDLE</div></div>
+            <div class="arow" id="ar-sched"><div class="aav" style="background:rgba(255,165,2,.12)">📅</div><div class="ainf"><div class="aname">Scheduler Agent</div><div class="adesc">Google Workspace API</div></div><div class="abadge bi" id="ab-sched">IDLE</div></div>
+            <div class="arow" id="ar-task"><div class="aav" style="background:rgba(167,139,250,.12)">✅</div><div class="ainf"><div class="aname">Task Agent</div><div class="adesc">Google Tasks · Work Orders</div></div><div class="abadge bi" id="ab-task">IDLE</div></div>
+            <div class="arow" id="ar-anal"><div class="aav" style="background:rgba(0,212,170,.08)">📊</div><div class="ainf"><div class="aname">Analytics Agent</div><div class="adesc">Google BigQuery · MTTR Export</div></div><div class="abadge bi" id="ab-anal">IDLE</div></div>
+          </div>
+        </div>
+
+        <!-- LOG -->
+        <div class="card">
+          <div class="slabel">System Log</div>
+          <div class="logbox" id="logbox">
+            <div class="lentry" style="opacity:1"><span class="lts" id="initts">--:--:--</span><span class="llv info">INFO</span><span class="lmsg">Dashboard initialized. IoT monitor active.</span></div>
+          </div>
+        </div>
+
+        <!-- SUMMARY (hidden) -->
+        <div class="card" id="sumCard" style="display:none">
+          <div class="slabel">Incident Resolution Summary</div>
+          <div class="sumfields" id="sumFields"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB 2: ALLOYDB INSPECTOR ══════════ -->
+<div class="tab-panel" id="tp-db">
+  <div class="page">
+
+    <div class="db-meta">
+      <div class="dbm"><div class="dbml">Database</div><div class="dbmv ca">manuals_db</div><div class="dbms">AlloyDB for PostgreSQL</div></div>
+      <div class="dbm"><div class="dbml">Table</div><div class="dbmv" style="color:var(--acc2)">machine_manuals</div><div class="dbms">pgvector extension · ivfflat index</div></div>
+      <div class="dbm"><div class="dbml">Vector Dimensions</div><div class="dbmv cp">768</div><div class="dbms">text-embedding-004 output</div></div>
+    </div>
+
+    <!-- Schema -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="slabel">Table Schema — machine_manuals</div>
+      <table class="schm">
+        <thead><tr><th>Column</th><th>Type</th><th>Constraint</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>id</td><td class="ttype">VARCHAR(50)</td><td class="tpk">PRIMARY KEY</td><td style="color:var(--mute)">Unique doc ID</td></tr>
+          <tr><td>error_code</td><td class="ttype">VARCHAR(50)</td><td></td><td style="color:var(--mute)">Machine fault code</td></tr>
+          <tr><td>asset</td><td class="ttype">VARCHAR(100)</td><td></td><td style="color:var(--mute)">Physical equipment</td></tr>
+          <tr><td>resolution</td><td class="ttype">TEXT</td><td></td><td style="color:var(--mute)">Fix instructions</td></tr>
+          <tr><td>embedding</td><td class="ttype">VECTOR(768)</td><td>INDEX ivfflat</td><td style="color:var(--mute)">AI semantic embedding</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Split Panels -->
+    <div class="split">
+      <!-- Panel 1: JSON Records -->
+      <div class="card">
+        <div class="ptitle">📄 Raw Incident Records <span class="pbadge pb1">JSON / ALLOYDB</span></div>
+        <pre class="code"><span class="jk">[
+  {
+    "id":</span>         <span class="js">"doc-001"</span><span class="jk">,
+    "error_code":</span> <span class="js">"ERR-404-TEMP"</span><span class="jk">,
+    "asset":</span>      <span class="js">"Conveyor Motor B"</span><span class="jk">,
+    "resolution":</span> <span class="js">"Blown thermal fuse. Replace fuse #F-99."</span>
+  <span class="jk">},
+  {
+    "id":</span>         <span class="js">"doc-002"</span><span class="jk">,
+    "error_code":</span> <span class="js">"ERR-502-VIB"</span><span class="jk">,
+    "asset":</span>      <span class="js">"Robotic Arm Assembly"</span><span class="jk">,
+    "resolution":</span> <span class="js">"Servo misalignment. Recalibrate axes X and Y."</span>
+  <span class="jk">},
+  {
+    "id":</span>         <span class="js">"doc-003"</span><span class="jk">,
+    "error_code":</span> <span class="js">"ERR-301-PRS"</span><span class="jk">,
+    "asset":</span>      <span class="js">"Hydraulic Press Valve"</span><span class="jk">,
+    "resolution":</span> <span class="js">"Pressure leak. Tighten main seal and refill fluid."</span>
+  <span class="jk">}
+]</span></pre>
+        <div style="margin-top:12px;font-size:11px;color:var(--mute)">
+          ↳ Matched via <span style="color:var(--acc2)">pgvector cosine similarity</span> on the <code style="font-family:'JetBrains Mono',monospace;color:var(--acc)">embedding</code> column against the incoming IoT alert vector.
+        </div>
+      </div>
+
+      <!-- Panel 2: pgvector -->
+      <div class="card">
+        <div class="ptitle">🧬 pgvector Similarity Query <span class="pbadge pb2">VECTOR(768)</span></div>
+        <pre class="code"><span class="jk">-- Nearest-neighbor search
+SELECT</span> error_code, asset, resolution
+<span class="jk">FROM</span> machine_manuals
+<span class="jk">ORDER BY</span> embedding <span class="jv">&lt;-&gt;</span> query_vector
+<span class="jk">LIMIT</span> <span class="jn">1</span>;
+
+<span style="color:var(--mute)">-- Returned embedding vector (first record):</span>
+<span class="jv">[
+  0.0142, -0.0921,  0.1134, -0.0451,
+  0.8821,  0.3341, -0.1102,  0.2234,
+  0.0571, -0.7823,  0.4412,  0.1109,
+ -0.3341,  0.0821,  0.9102, -0.0234,
+  0.1823,  0.5512, -0.2109,  0.0371,
+  ...  <span style="color:var(--mute)">(768 dimensions total)</span>
+]</span></pre>
+        <div class="vtag">🔷 Embeddings generated via <strong>Vertex AI text-embedding-004</strong>.<br>Raw PDF manuals stored in <strong>Google Cloud Storage</strong>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─ Clock ─
+function tick(){
+  const t=new Date().toLocaleTimeString('en-US',{hour12:false});
+  document.getElementById('clk').textContent=t;
+  document.getElementById('initts').textContent=t;
+}
+tick(); setInterval(tick,1000);
+function ts(){return new Date().toLocaleTimeString('en-US',{hour12:false});}
+
+// ─ Tab switch ─
+function switchTab(id){
+  ['ops','db'].forEach(t=>{
+    document.getElementById('tb-'+t).classList.toggle('active',t===id);
+    document.getElementById('tp-'+t).classList.toggle('active',t===id);
+  });
+}
+
+// ─ Incidents ─
+const INCIDENTS=[
+  {id:'INC-001',error:'ERR-404-TEMP',asset:'Conveyor Motor B',fix:'Blown thermal fuse. Replace fuse #F-99.',time:'45 min',tech:'Sarah'},
+  {id:'INC-002',error:'ERR-502-VIB',asset:'Robotic Arm Assembly',fix:'Servo misalignment detected. Recalibrate axes X and Y.',time:'30 min',tech:'David'},
+  {id:'INC-003',error:'ERR-301-PRS',asset:'Hydraulic Press Valve',fix:'Pressure leak. Tighten main seal and refill fluid.',time:'60 min',tech:'Elena'},
+];
+
+// ─ Helpers ─
+const feed=document.getElementById('feed');
+const logbox=document.getElementById('logbox');
+
+function addFeed(icls,tcls,tlbl,icon,html){
+  const d=document.createElement('div');
+  d.className='feed-item';
+  d.innerHTML=`<div class="ficon ${icls}">${icon}</div>
+    <div class="fbody">
+      <div class="fhead"><span class="ftag ${tcls}">${tlbl}</span><span class="fts">${ts()}</span></div>
+      <div class="ftext">${html}</div>
+    </div>`;
+  feed.appendChild(d); feed.scrollTop=99999;
+}
+
+function addLog(lv,msg){
+  const d=document.createElement('div');
+  d.className='lentry';
+  d.innerHTML=`<span class="lts">${ts()}</span><span class="llv ${lv}">${lv.toUpperCase()}</span><span class="lmsg">${msg}</span>`;
+  logbox.appendChild(d); logbox.scrollTop=99999;
+}
+
+function setAgent(id,st){
+  const row=document.getElementById('ar-'+id);
+  const badge=document.getElementById('ab-'+id);
+  row.className='arow'+(st==='running'?' running':st==='done'?' done':'');
+  badge.className='abadge '+(st==='running'?'br':st==='done'?'bd':'bi');
+  badge.textContent=st==='running'?'RUNNING':st==='done'?'DONE':'IDLE';
+}
+
+function setProgress(pct,lbl){
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progLbl').textContent=lbl;
+}
+
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ─ Workflow ─
+let ran=false;
+async function runWorkflow(){
+  if(ran)return; ran=true;
+  document.getElementById('trigBtn').disabled=true;
+  document.getElementById('emptyFeed')?.remove();
+
+  const inc=INCIDENTS[Math.floor(Math.random()*INCIDENTS.length)];
+  document.getElementById('k-inc').textContent='1';
+
+  setProgress(5,'Alert ingested from Cloud Pub/Sub…');
+  addLog('error',`Cloud Pub/Sub: ${inc.error} on ${inc.asset}`);
+
+  // Step 1 — Alert
+  await delay(800);
+  addFeed('rd','tr','CLOUD PUB/SUB','🚨',
+    `<div class="alertbox">[Cloud Pub/Sub Ingestion] 🚨 ALERT: ${inc.error} on ${inc.asset}. Overheating. Immediate action required.</div>`);
+  addLog('error',`${inc.error} on ${inc.asset}. Escalating to Coordinator.`);
+  setProgress(16,'Coordinator initializing…');
+
+  // Step 2 — Coordinator
+  await delay(1500);
+  setAgent('coord','running');
+  addFeed('gr','tc','COORDINATOR','🧠',
+    `PRIMARY AGENT: Gemini 1.5 Pro Orchestrator initialized. Dispatching sub-agents for <strong>${inc.id}</strong>.`);
+  addLog('info',`Coordinator online. Dispatching knowledge_agent for ${inc.error}.`);
+  setProgress(30,'Knowledge agent searching AlloyDB…');
+
+  // Step 3 — Knowledge Agent
+  await delay(1500);
+  setAgent('coord','done'); setAgent('know','running');
+  addFeed('bl','tk','KNOWLEDGE AGENT','🤖',
+    `<div class="inv">↳ <span>Invoking knowledge_agent</span> · AlloyDB pgvector search · text-embedding-004</div>
+     <div class="outbox">🤖 Knowledge Agent: AlloyDB pgvector search complete.<br>
+     <strong style="color:var(--acc2)">Fix:</strong> ${inc.fix}<br>
+     <strong style="color:var(--acc2)">Est. Repair Time:</strong> ${inc.time}</div>`);
+  addLog('info',`AlloyDB: ${inc.error} → ${inc.fix.substring(0,40)}…`);
+  setProgress(50,'Scheduling technician via Google Workspace…');
+
+  // Step 4 — Scheduler
+  await delay(1500);
+  setAgent('know','done'); setAgent('sched','running');
+  addFeed('or','ts','SCHEDULER AGENT','📅',
+    `<div class="inv">↳ <span>Invoking scheduler_agent</span> · Google Workspace API · duration=${inc.time} · tech=${inc.tech}</div>
+     <div class="outbox">📅 Scheduler Agent: Google Workspace API booked <strong>${inc.tech}</strong> for <strong>${inc.time}</strong>.</div>`);
+  addLog('ok',`Google Workspace: ${inc.tech} booked for ${inc.time}.`);
+  setProgress(65,'Dispatching work order…');
+
+  // Step 5 — Task Agent
+  await delay(1500);
+  setAgent('sched','done'); setAgent('task','running');
+  addFeed('pu','tt','TASK AGENT','✅',
+    `<div class="inv">↳ <span>Invoking task_agent</span> · Google Tasks · tech=${inc.tech} · wo=${inc.id}</div>
+     <div class="outbox">✅ Task Agent: Work Order <strong style="color:var(--pur)">${inc.id}</strong> dispatched to <strong>${inc.tech}</strong>'s device.</div>`);
+  addLog('ok',`Work order ${inc.id} dispatched to ${inc.tech}.`);
+  setProgress(80,'Exporting metrics to BigQuery…');
+
+  // Step 6 — Analytics
+  await delay(1500);
+  setAgent('task','done'); setAgent('anal','running');
+  addFeed('gr','ta','ANALYTICS AGENT','📊',
+    `<div class="inv">↳ <span>Invoking analytics_agent</span> · Google BigQuery · incident_id=${inc.id}</div>
+     <div class="outbox">📊 Analytics Agent: MTTR metrics for <strong>${inc.id}</strong> exported to Google BigQuery. MTTR dashboard updated.</div>`);
+  addLog('info',`BigQuery: MTTR metrics exported for ${inc.id}.`);
+  setProgress(93,'Finalizing resolution…');
+
+  // Step 7 — Success
+  await delay(1500);
+  setAgent('anal','done');
+  document.getElementById('k-res').textContent='1';
+  document.getElementById('k-mttr').textContent=inc.time;
+
+  const calUrl=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=URGENT+Repair:+${encodeURIComponent(inc.asset)}&details=Technician+${encodeURIComponent(inc.tech)}+assigned.+Fix:+${encodeURIComponent(inc.fix)}`;
+
+  addFeed('ok','td','RESOLVED','🎉',
+    `<div class="succ-banner">
+      <div class="succ-title">🎉 Final Answer: Autonomous Resolution Complete — ${inc.id}</div>
+      <div class="succ-body">
+        The incident <strong>${inc.id}</strong> (${inc.error}) on <strong>${inc.asset}</strong> has been autonomously resolved.
+        Technician <strong>${inc.tech}</strong> has been booked for a <strong>${inc.time}</strong> repair slot.
+        Work Order <strong>${inc.id}</strong> dispatched and MTTR metrics exported to BigQuery.
+      </div>
+      <a class="cal-btn" href="${calUrl}" target="_blank">📅 Verify Live Booking in Google Calendar</a>
+    </div>`);
+  addLog('ok',`Incident ${inc.id} fully resolved. All agents complete.`);
+  setProgress(100,'✓ Incident autonomously resolved');
+
+  // Summary
+  const sc=document.getElementById('sumCard');
+  const sf=document.getElementById('sumFields');
+  sf.innerHTML=`
+    <div class="sf"><span class="sfl">Incident ID</span><span class="sfv ca">${inc.id}</span></div>
+    <div class="sf"><span class="sfl">Error Code</span><span class="sfv red">${inc.error}</span></div>
+    <div class="sf"><span class="sfl">Asset</span><span class="sfv">${inc.asset}</span></div>
+    <div class="sf"><span class="sfl">Fix</span><span class="sfv">${inc.fix}</span></div>
+    <div class="sf"><span class="sfl">Repair Time</span><span class="sfv ca">${inc.time}</span></div>
+    <div class="sf"><span class="sfl">Technician</span><span class="sfv ca">${inc.tech}</span></div>
+    <div class="sf"><span class="sfl">Work Order</span><span class="sfv pu">${inc.id}</span></div>
+    <div class="sf"><span class="sfl">Status</span><span class="sfv ok">✓ RESOLVED</span></div>
+  `;
+  sc.style.display='block';
+  sc.style.animation='fsi .5s ease forwards';
+  sc.style.opacity='0';
+}
+</script>
+</body>
+</html>
