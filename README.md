@@ -7,6 +7,10 @@
 ** ⚡️Live Demo:** [https://fixflow-ai-782015793406.asia-south1.run.app/](https://fixflow-ai-782015793406.asia-south1.run.app/) ⚡️
 
 
+<img width="900" height="500" alt="image" src="https://github.com/user-attachments/assets/fdb5b1b9-0ef7-4b8f-ac11-a0e59b6665a7" />
+
+
+
 > **In industrial manufacturing, every minute of downtime costs thousands of dollars. When a machine fails, the process of finding the right manual, checking technician availability, and creating work orders is slow and manual.**
 >
 > 
@@ -65,3 +69,8 @@ When the workflow completes, the agent doesn't just output text—it prepares a 
 ### 🏆 Hackathon Alignment
 
 FixFlow AI meets all requirements for **Track 1** and **Track 3** by combining Gemini orchestration with AI-ready databases (AlloyDB). We’ve successfully turned hours of industrial downtime into minutes of automated action.
+
+
+
+<img width="782" height="461" alt="image" src="https://github.com/user-attachments/assets/63e27347-64d4-4abd-b499-134e9f9f9347" />
+
