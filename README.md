@@ -11,7 +11,8 @@
 
 
 
-<img width="1132" height="617" alt="Screenshot 2026-04-06 004107" src="https://github.com/user-attachments/assets/ee4b9989-8d7e-43e0-b163-507351e6aca5" /> <img width="260" height="641" alt="image" src="https://github.com/user-attachments/assets/67dbd4dd-48cf-4d12-8377-1725d174adca" />
+
+<img width="300" height="600" alt="image" src="https://github.com/user-attachments/assets/67dbd4dd-48cf-4d12-8377-1725d174adca" />
 
 
 
