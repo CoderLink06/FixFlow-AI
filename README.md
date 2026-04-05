@@ -4,7 +4,7 @@
 # ⚡️ FixFlow AI: Zero-Downtime Multi-Agent Orchestrator
 
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Cloud_Run-blue?style=for-the-badge&logo=googlecloud)](https://fixflow-ai-782015793406.asia-south1.run.app/)
+** ⚡️Live Demo:** [https://fixflow-ai-782015793406.asia-south1.run.app/](https://fixflow-ai-782015793406.asia-south1.run.app/) ⚡️
 
 
 > **In industrial manufacturing, every minute of downtime costs thousands of dollars. When a machine fails, the process of finding the right manual, checking technician availability, and creating work orders is slow and manual.**
