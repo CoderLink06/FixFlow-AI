@@ -6,14 +6,14 @@
 # ⚡️ FixFlow AI: Zero-Downtime Multi-Agent Orchestrator
 
 
-** ⚡️Live Demo:** [https://fixflow-ai-782015793406.asia-south1.run.app/](https://fixflow-ai-782015793406.asia-south1.run.app/) ⚡️
+** ⚡️Live Demo: [https://fixflow-ai-782015793406.asia-south1.run.app/](https://fixflow-ai-782015793406.asia-south1.run.app/) ⚡️
 
 
 
 
-
-<img width="300" height="600" alt="image" src="https://github.com/user-attachments/assets/67dbd4dd-48cf-4d12-8377-1725d174adca" />
-
+<p align="center">
+  <img width="400" height="600" alt="image" src="https://github.com/user-attachments/assets/67dbd4dd-48cf-4d12-8377-1725d174adca" />
+</p>
 
 
 
