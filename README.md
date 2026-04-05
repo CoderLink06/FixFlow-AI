@@ -1,14 +1,18 @@
-<img width="652" height="651" alt="Screenshot 2026-04-05 220410" src="https://github.com/user-attachments/assets/d5ba5bf0-c589-4287-bdfb-04ef4c29d083" />
+<img width="550" height="250" alt="image" src="https://github.com/user-attachments/assets/b64dc89c-4620-4059-9fc4-0998673221dc" />
+
 
 # ⚡️ FixFlow AI: Zero-Downtime Multi-Agent Orchestrator
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Cloud_Run-blue?style=for-the-badge&logo=googlecloud)]([YOUR_CLOUD_RUN_LINK_HERE](https://fixflow-ai-782015793406.asia-south1.run.app/))
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Cloud_Run-blue?style=for-the-badge&logo=googlecloud)](https://fixflow-ai-782015793406.asia-south1.run.app/)
 
 
 > **In industrial manufacturing, every minute of downtime costs thousands of dollars. When a machine fails, the process of finding the right manual, checking technician availability, and creating work orders is slow and manual.**
 >
-> <img width="2560" height="1707" alt="image" src="https://github.com/user-attachments/assets/54d5e44d-a020-44ff-ad51-8307cedc4744" />
+> 
+> <img width="1500" height="1600" alt="image" src="https://github.com/user-attachments/assets/54d5e44d-a020-44ff-ad51-8307cedc4744" />
 >
+> 
 > <img width="1500" height="1000" alt="image" src="https://github.com/user-attachments/assets/c7c2bfa4-e6e1-402a-b6d0-09ebfb450524" />
 
 > **Meet FixFlow AI—a multi-agent orchestrator designed to automate industrial maintenance from alert to resolution.**
