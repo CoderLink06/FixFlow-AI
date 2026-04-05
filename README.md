@@ -7,7 +7,8 @@
 ** ⚡️Live Demo:** [https://fixflow-ai-782015793406.asia-south1.run.app/](https://fixflow-ai-782015793406.asia-south1.run.app/) ⚡️
 
 
-<img width="900" height="500" alt="image" src="https://github.com/user-attachments/assets/fdb5b1b9-0ef7-4b8f-ac11-a0e59b6665a7" />
+<img width="1138" height="611" alt="Screenshot 2026-04-06 004301" src="https://github.com/user-attachments/assets/194b7ac6-e684-4614-81ab-0e4e82ba0d5c" />
+
 
 
 
