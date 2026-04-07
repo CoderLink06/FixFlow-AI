@@ -25,11 +25,14 @@
 
 
 
->
+><img width="900" height="500" alt="Screenshot 2026-04-07 203206" src="https://github.com/user-attachments/assets/8a47931c-11f4-4c4b-83ed-e4e554dd6930" />
 
->
+
+
+
 > 
-> <img width="1300" height="800" alt="image" src="https://github.com/user-attachments/assets/c7c2bfa4-e6e1-402a-b6d0-09ebfb450524" />
+> <img width="800" height="400" alt="image" src="https://github.com/user-attachments/assets/c7c2bfa4-e6e1-402a-b6d0-09ebfb450524" />
+
 
 
 
