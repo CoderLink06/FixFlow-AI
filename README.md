@@ -12,9 +12,7 @@
 
 
 <p align="center">
-  <img width="800" height="300" alt="Screenshot 2026-04-07 203206" src="https://github.com/user-attachments/assets/7c3a6a54-2593-46d6-b8f7-05a83bbaa07f" />
-
-  <img width="500" height="200" alt="image" src="https://github.com/user-attachments/assets/15c80a98-8309-49f0-9357-b5b57570578c" />
+  <img width="1180" height="800" alt="image" src="https://github.com/user-attachments/assets/15c80a98-8309-49f0-9357-b5b57570578c" />
   
 
 </p>
